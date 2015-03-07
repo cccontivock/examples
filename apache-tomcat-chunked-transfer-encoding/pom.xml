@@ -8,13 +8,20 @@
 	<name>apache-tomcat-chunked-transfer-encoding</name>
 	<url>http://maven.apache.org</url>
 	<properties>
-		<version.apache-tomcat>8.0.20</version.apache-tomcat>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<version.apache-tomcat>8.0.18</version.apache-tomcat>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-servlet-api</artifactId>
 			<version>${version.apache-tomcat}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat</artifactId>
+			<version>${version.apache-tomcat}</version>
+			<type>zip</type>
 		</dependency>
 	</dependencies>
 	<build>
@@ -27,6 +34,19 @@
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.cargo</groupId>
+				<artifactId>cargo-maven2-plugin</artifactId>
+				<version>1.4.13</version>
+				<configuration>
+					<container>
+						<containerId>tomcat8x</containerId>
+						<zipUrlInstaller>
+							<url>http://archive.apache.org/dist/tomcat/tomcat-8/v${version.apache-tomcat}/bin/apache-tomcat-${version.apache-tomcat}.zip</url>
+						</zipUrlInstaller>
+					</container>
 				</configuration>
 			</plugin>
 		</plugins>
