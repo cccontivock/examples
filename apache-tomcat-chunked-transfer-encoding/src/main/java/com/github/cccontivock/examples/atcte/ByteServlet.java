@@ -19,11 +19,13 @@ public class ByteServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		log(getClass().getName() + " processing an HTTP GET request.");
 		response.addHeader("Content-Length", "-1");
 		OutputStream outputStream = response.getOutputStream();
 		for (int bytesServedCt = 0; bytesServedCt < bytesToServeCountTotal; bytesServedCt++) {
 			outputStream.write('*');
 		}
 		outputStream.flush();
+		outputStream.close();
 	}
 }

@@ -25,6 +25,8 @@ class ChunkedByteReadingTask implements Runnable {
 		try {
 			HttpURLConnection huc = (HttpURLConnection) url.openConnection();
 			huc.setChunkedStreamingMode(4096);
+			huc.setDoOutput(true);
+			huc.setRequestMethod("GET");
 			huc.connect();
 			InputStream inputStream = huc.getInputStream();
 			byte[] bytes = new byte[1024];
