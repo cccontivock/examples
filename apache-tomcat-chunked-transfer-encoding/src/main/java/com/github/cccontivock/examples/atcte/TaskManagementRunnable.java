@@ -9,10 +9,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.servlet.GenericServlet;
 
 class TaskManagementRunnable implements Runnable {
-
 	private final GenericServlet genericServlet;
 	private final URL url;
 	private final AtomicBoolean chunkDecodingFailed = new AtomicBoolean(false);
+	private final AtomicBoolean shouldStop = new AtomicBoolean(false);
 	private int taskCount = 1;
 	private ExecutorService executorService;
 
@@ -24,15 +24,15 @@ class TaskManagementRunnable implements Runnable {
 	@Override
 	public void run() {
 		boolean erred = false;
-		while (!erred && !anyChunkDecodingFailed()) {
+		while (taskCount < 512 && !erred && !chunkDecodingFailed.get()
+				&& !shouldStop.get()) {
 			increaseChunkedByteReadersCount();
 			startChunkedByteReaders();
 			erred = waitForChunkedByteReaders();
 		}
-	}
-
-	private boolean anyChunkDecodingFailed() {
-		return chunkDecodingFailed.get();
+		genericServlet.log("Did" + (chunkDecodingFailed.get() ? "" : " not")
+				+ " encounter chunk-decoding failure.");
+		genericServlet.log(getClass().getName() + ".run() exiting.");
 	}
 
 	private int increaseChunkedByteReadersCount() {
@@ -43,7 +43,7 @@ class TaskManagementRunnable implements Runnable {
 		executorService = Executors.newFixedThreadPool(taskCount);
 		for (int taskIdx = 0; taskIdx < taskCount; taskIdx++) {
 			executorService.execute(new ChunkedByteReadingTask(genericServlet,
-					url, chunkDecodingFailed));
+					url, chunkDecodingFailed, shouldStop));
 		}
 	}
 
